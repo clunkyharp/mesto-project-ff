@@ -8,6 +8,14 @@ export function closeModal(popup) {
   document.removeEventListener("keydown", handleEscapeClose);
 }
 
+export function overlayClose(popup) {
+  popup.addEventListener("mousedown", (evt) => {
+    if (evt.target === evt.currentTarget) {
+      closeModal(popup);
+    }
+  });
+}
+
 function handleEscapeClose(evt) {
   if (evt.key === "Escape") {
     const openedPopup = document.querySelector(".popup_is-opened");

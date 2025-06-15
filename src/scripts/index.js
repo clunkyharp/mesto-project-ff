@@ -1,7 +1,7 @@
 import "../pages/index.css";
-import { openModal, closeModal } from "./modal.js";
-import { createCard } from "./card.js";
 import { initialCards } from "./cards.js";
+import { openModal, closeModal, overlayClose } from "./modal.js";
+import { createCard, handleLikeButton } from "./card.js";
 
 const profileEditButton = document.querySelector(".profile__edit-button");
 const profileAddButton = document.querySelector(".profile__add-button");
@@ -26,18 +26,26 @@ const cardList = document.querySelector(".places__list");
 const popupImage = imagePopup.querySelector(".popup__image");
 const popupCaption = imagePopup.querySelector(".popup__caption");
 
+const popups = document.querySelectorAll(".popup");
+popups.forEach(overlayClose);
+
 document.querySelectorAll(".popup__close").forEach((button) => {
   const popup = button.closest(".popup");
   button.addEventListener("click", () => closeModal(popup));
 });
 
-document.querySelectorAll(".popup").forEach((popup) => {
-  popup.addEventListener("mousedown", (evt) => {
-    if (evt.target === popup) {
-      closeModal(popup);
-    }
-  });
-});
+function handleDeleteButton(cardElement) {
+  cardElement.remove();
+}
+
+function handleImageClick(name, link) {
+  if (!name || !link) return;
+
+  popupImage.src = link;
+  popupImage.alt = name;
+  popupCaption.textContent = name;
+  openModal(imagePopup);
+}
 
 profileEditButton.addEventListener("click", () => {
   nameInput.value = profileName.textContent;
@@ -61,26 +69,20 @@ formAddCard.addEventListener("submit", (evt) => {
   evt.preventDefault();
   const newCard = createCard(
     { name: titleInput.value, link: linkInput.value },
-    handleLikeClick,
+    handleLikeButton,
+    handleDeleteButton,
     handleImageClick
   );
   cardList.prepend(newCard);
   closeModal(addCardPopup);
-  formAddCard.reset();
 });
 
-function handleLikeClick(evt) {
-  evt.target.classList.toggle("card__like-button_is-active");
-}
-
-function handleImageClick(evt) {
-  popupImage.src = evt.target.src;
-  popupImage.alt = evt.target.alt;
-  popupCaption.textContent = evt.target.alt;
-  openModal(imagePopup);
-}
-
 initialCards.forEach((data) => {
-  const card = createCard(data, handleLikeClick, handleImageClick);
+  const card = createCard(
+    data,
+    handleLikeButton,
+    handleDeleteButton,
+    handleImageClick
+  );
   cardList.append(card);
 });
