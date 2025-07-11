@@ -1,7 +1,3 @@
 # Проектная работа Mesto
 
-https://students-yandex.github.io/mesto-project
-
-# clunkyharp
-
-# mesto-project-ff
+https://clunkyharp.github.io/mesto-project-ff/
