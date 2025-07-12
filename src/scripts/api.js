@@ -70,14 +70,3 @@ export const updateAvatar = (avatarUrl) => {
   }).then(handleResponse);
 };
 
-export const renderLoading = (isLoading, buttonElement) => {
-  if (!buttonElement) return;
-
-  if (isLoading) {
-    buttonElement.textContent = "Сохранение...";
-    buttonElement.disabled = true;
-  } else {
-    buttonElement.textContent = "Сохранить";
-    buttonElement.disabled = false;
-  }
-};

@@ -80,11 +80,7 @@ export function clearValidation(formElement, config) {
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
   inputList.forEach((inputElement) => {
-    const errorElement = formElement.querySelector(`#${inputElement.id}-error`);
-    inputElement.classList.remove(config.inputErrorClass);
-    errorElement.classList.remove(config.errorClass);
-    errorElement.textContent = "";
-    inputElement.setCustomValidity("");
+    hideError(formElement, inputElement, config);
   });
 
   buttonElement.classList.add(config.inactiveButtonClass);

@@ -1,3 +1,13 @@
+export function checkLikeCount(cardElement, likeCountValue, isActive) {
+  const likeButton = cardElement.querySelector(".card__like-button");
+  const likeCounter = cardElement.querySelector(".card__like-count");
+
+  if (!likeButton || !likeCounter) return;
+
+  likeButton.classList.toggle("card__like-button_is-active", isActive);
+  likeCounter.textContent = likeCountValue;
+}
+
 export function createCard(
   cardData,
   handleLikeButton,
@@ -20,16 +30,11 @@ export function createCard(
   cardImage.src = link;
   cardImage.alt = name;
 
-  // Подсчёт лайков
-  likeCounter.textContent = likes.length;
+  const isLiked = likes.some((user) => user._id === currentUserId);
   likeCounter.classList.add("card__like-count");
   likeButton.after(likeCounter);
 
-  // Проверка: лайкал ли пользователь
-  const isLiked = likes.some((user) => user._id === currentUserId);
-  if (isLiked) {
-    likeButton.classList.add("card__like-button_is-active");
-  }
+  checkLikeCount(cardElement, likes.length, isLiked);
 
   likeButton.addEventListener("click", () => {
     handleLikeButton(
@@ -39,7 +44,6 @@ export function createCard(
     );
   });
 
-  // Показывать кнопку удаления только владельцу
   if (owner._id === currentUserId) {
     deleteButton.addEventListener("click", () =>
       handleDeleteButton(cardElement, _id)
@@ -52,3 +56,4 @@ export function createCard(
 
   return cardElement;
 }
+

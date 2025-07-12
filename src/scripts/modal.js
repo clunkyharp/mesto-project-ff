@@ -8,7 +8,7 @@ export function closeModal(popup) {
   document.removeEventListener("keydown", handleEscapeClose);
 }
 
-export function overlayClose(popup) {
+export function closeOverlay(popup) {
   popup.addEventListener("mousedown", (evt) => {
     if (evt.target === evt.currentTarget) {
       closeModal(popup);

@@ -1,7 +1,7 @@
 import "../pages/index.css";
 
-import { openModal, closeModal, overlayClose } from "./modal.js";
-import { createCard } from "./card.js";
+import { openModal, closeModal, closeOverlay } from "./modal.js";
+import { createCard, checkLikeCount } from "./card.js";
 import { clearValidation, enableValidation } from "./validation.js";
 import {
   getUserInfo,
@@ -12,7 +12,6 @@ import {
   likeCard,
   unlikeCard,
   updateAvatar,
-  renderLoading,
 } from "./api.js";
 
 const profileEditButton = document.querySelector(".profile__edit-button");
@@ -42,8 +41,12 @@ const cardList = document.querySelector(".places__list");
 const popupImage = imagePopup.querySelector(".popup__image");
 const popupCaption = imagePopup.querySelector(".popup__caption");
 
+const avatarSubmitButton = avatarForm.querySelector(".popup__button");
+const profileSubmitButton = formEditProfile.querySelector(".popup__button");
+const addCardSubmitButton = formAddCard.querySelector(".popup__button");
+
 const popups = document.querySelectorAll(".popup");
-popups.forEach(overlayClose);
+popups.forEach(closeOverlay);
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -61,6 +64,18 @@ document.querySelectorAll(".popup__close").forEach((button) => {
   button.addEventListener("click", () => closeModal(popup));
 });
 
+const renderLoading = (isLoading, buttonElement) => {
+  if (!buttonElement) return;
+
+  if (isLoading) {
+    buttonElement.textContent = "Сохранение...";
+    buttonElement.disabled = true;
+  } else {
+    buttonElement.textContent = "Сохранить";
+    buttonElement.disabled = false;
+  }
+};
+
 function handleDeleteButton(cardElement, cardId) {
   deleteCard(cardId)
     .then(() => {
@@ -72,15 +87,12 @@ function handleDeleteButton(cardElement, cardId) {
 }
 
 function handleLikeButton(cardElement, cardId, isLiked) {
-  const likeBtn = cardElement.querySelector(".card__like-button");
-  const likeCount = cardElement.querySelector(".card__like-count");
-
   const apiCall = isLiked ? unlikeCard : likeCard;
 
   apiCall(cardId)
     .then((updatedCard) => {
-      likeBtn.classList.toggle("card__like-button_is-active");
-      likeCount.textContent = updatedCard.likes.length;
+      const newIsLiked = !isLiked;
+      checkLikeCount(cardElement, updatedCard.likes.length, newIsLiked);
     })
     .catch((err) => {
       console.error("Ошибка при переключении лайка:", err);
@@ -119,8 +131,7 @@ avatarForm.addEventListener("submit", (evt) => {
   evt.preventDefault();
 
   const newAvatarUrl = avatarInput.value;
-  const submitButton = avatarForm.querySelector(".popup__button");
-  renderLoading(true, submitButton);
+  renderLoading(true, avatarSubmitButton);
 
   updateAvatar(newAvatarUrl)
     .then((userData) => {
@@ -132,18 +143,17 @@ avatarForm.addEventListener("submit", (evt) => {
       console.error("Ошибка при обновлении аватара:", err);
     })
     .finally(() => {
-      renderLoading(false, submitButton);
+      renderLoading(false, avatarSubmitButton);
     });
 });
 
 formEditProfile.addEventListener("submit", (evt) => {
   evt.preventDefault();
 
-  const submitButton = formEditProfile.querySelector(".popup__button");
   const name = nameInput.value;
   const about = profileDecriptionInput.value;
 
-  renderLoading(true, submitButton);
+  renderLoading(true, profileSubmitButton);
 
   updateUserInfo(name, about)
     .then((userData) => {
@@ -155,7 +165,7 @@ formEditProfile.addEventListener("submit", (evt) => {
       console.error("Ошибка при обновлении профиля:", err);
     })
     .finally(() => {
-      renderLoading(false, submitButton);
+      renderLoading(false, profileSubmitButton);
     });
 });
 
@@ -164,8 +174,8 @@ formAddCard.addEventListener("submit", (evt) => {
 
   const name = titleInput.value;
   const link = linkInput.value;
-  const submitButton = formAddCard.querySelector(".popup__button");
-  renderLoading(true, submitButton);
+
+  renderLoading(true, addCardSubmitButton);
 
   addNewCard(name, link)
     .then((cardData) => {
@@ -183,7 +193,7 @@ formAddCard.addEventListener("submit", (evt) => {
       console.error("Ошибка при добавлении карточки:", err);
     })
     .finally(() => {
-      renderLoading(false, submitButton);
+      renderLoading(false, addCardSubmitButton);
     });
 });
 
